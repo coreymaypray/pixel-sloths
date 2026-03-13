@@ -384,7 +384,7 @@ function App() {
             </div>
             <p style={{ fontSize: '26px', color: 'var(--pixel-text)', margin: '0 0 12px 0' }}>
               We've just migrated to fully open-source assets, all built from scratch with love.
-              Unfortunately, this meant your previous layout had to be reset.
+              Unfortunately, this means your previous layout had to be reset.
             </p>
             <p style={{ fontSize: '26px', color: 'var(--pixel-text)', margin: '0 0 12px 0' }}>
               We're really sorry about that.
