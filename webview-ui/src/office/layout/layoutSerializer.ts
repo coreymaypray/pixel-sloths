@@ -237,8 +237,8 @@ export function getSeatTiles(seats: Map<string, Seat>): Set<string> {
 }
 
 /** Default floor colors for the two rooms */
-const DEFAULT_LEFT_ROOM_COLOR: FloorColor = { h: 35, s: 30, b: 15, c: 0 }; // warm beige
-const DEFAULT_RIGHT_ROOM_COLOR: FloorColor = { h: 25, s: 45, b: 5, c: 10 }; // warm brown
+const DEFAULT_LEFT_ROOM_COLOR: FloorColor = { h: 140, s: 35, b: 10, c: 0 }; // forest green
+const DEFAULT_RIGHT_ROOM_COLOR: FloorColor = { h: 100, s: 30, b: 5, c: 10 }; // moss green
 
 /** Create a minimal fallback layout (used only when no default-layout.json exists) */
 export function createDefaultLayout(): OfficeLayout {

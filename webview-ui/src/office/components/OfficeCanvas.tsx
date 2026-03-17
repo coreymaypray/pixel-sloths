@@ -799,7 +799,7 @@ export function OfficeCanvas({
         height: '100%',
         position: 'relative',
         overflow: 'hidden',
-        background: '#1E1E2E',
+        background: '#0A1A12',
       }}
     >
       <canvas

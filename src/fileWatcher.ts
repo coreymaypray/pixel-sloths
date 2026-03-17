@@ -24,7 +24,7 @@ export function startFileWatching(
     });
     fileWatchers.set(agentId, watcher);
   } catch (e) {
-    console.log(`[Pixel Agents] fs.watch failed for agent ${agentId}: ${e}`);
+    console.log(`[Pixel Sloths] fs.watch failed for agent ${agentId}: ${e}`);
   }
 
   // Secondary: fs.watchFile (stat-based polling, reliable on macOS)
@@ -33,7 +33,7 @@ export function startFileWatching(
       readNewLines(agentId, agents, waitingTimers, permissionTimers, webview);
     });
   } catch (e) {
-    console.log(`[Pixel Agents] fs.watchFile failed for agent ${agentId}: ${e}`);
+    console.log(`[Pixel Sloths] fs.watchFile failed for agent ${agentId}: ${e}`);
   }
 
   // Tertiary: manual poll as last resort
@@ -91,14 +91,14 @@ export function readNewLines(
       processTranscriptLine(agentId, line, agents, waitingTimers, permissionTimers, webview);
     }
   } catch (e) {
-    console.log(`[Pixel Agents] Read error for agent ${agentId}: ${e}`);
+    console.log(`[Pixel Sloths] Read error for agent ${agentId}: ${e}`);
   }
 }
 
 export function ensureProjectScan(
   projectDir: string,
   knownJsonlFiles: Set<string>,
-  projectScanTimerRef: { current: ReturnType<typeof setInterval> | null },
+  projectScanTimers: Map<string, ReturnType<typeof setInterval>>,
   activeAgentIdRef: { current: number | null },
   nextAgentIdRef: { current: number },
   agents: Map<number, AgentState>,
@@ -109,8 +109,12 @@ export function ensureProjectScan(
   webview: vscode.Webview | undefined,
   persistAgents: () => void,
 ): void {
-  if (projectScanTimerRef.current) return;
-  // Seed with all existing JSONL files so we only react to truly new ones
+  if (projectScanTimers.has(projectDir)) return;
+
+  // Auto-adopt recently active JSONL files (modified within last 5 minutes)
+  // This picks up sessions from the VS Code Claude Code extension
+  const RECENT_THRESHOLD_MS = 5 * 60 * 1000;
+  const now = Date.now();
   try {
     const files = fs
       .readdirSync(projectDir)
@@ -118,12 +122,47 @@ export function ensureProjectScan(
       .map((f) => path.join(projectDir, f));
     for (const f of files) {
       knownJsonlFiles.add(f);
+      // Check if this file is recently active and not already tracked
+      try {
+        const stat = fs.statSync(f);
+        const age = now - stat.mtimeMs;
+        if (age < RECENT_THRESHOLD_MS && stat.size > 0) {
+          // Check if any agent already tracks this file
+          let alreadyTracked = false;
+          for (const agent of agents.values()) {
+            if (agent.jsonlFile === f) {
+              alreadyTracked = true;
+              break;
+            }
+          }
+          if (!alreadyTracked) {
+            console.log(
+              `[Pixel Sloths] Auto-adopting active session: ${path.basename(f)} (${Math.round(age / 1000)}s old)`,
+            );
+            autoAdoptJsonlFile(
+              f,
+              projectDir,
+              nextAgentIdRef,
+              agents,
+              activeAgentIdRef,
+              fileWatchers,
+              pollingTimers,
+              waitingTimers,
+              permissionTimers,
+              webview,
+              persistAgents,
+            );
+          }
+        }
+      } catch {
+        /* stat failed, skip */
+      }
     }
   } catch {
     /* dir may not exist yet */
   }
 
-  projectScanTimerRef.current = setInterval(() => {
+  const timer = setInterval(() => {
     scanForNewJsonlFiles(
       projectDir,
       knownJsonlFiles,
@@ -138,6 +177,7 @@ export function ensureProjectScan(
       persistAgents,
     );
   }, PROJECT_SCAN_INTERVAL_MS);
+  projectScanTimers.set(projectDir, timer);
 }
 
 function scanForNewJsonlFiles(
@@ -169,7 +209,7 @@ function scanForNewJsonlFiles(
       if (activeAgentIdRef.current !== null) {
         // Active agent focused → /clear reassignment
         console.log(
-          `[Pixel Agents] New JSONL detected: ${path.basename(file)}, reassigning to agent ${activeAgentIdRef.current}`,
+          `[Pixel Sloths] New JSONL detected: ${path.basename(file)}, reassigning to agent ${activeAgentIdRef.current}`,
         );
         reassignAgentToFile(
           activeAgentIdRef.current,
@@ -215,6 +255,64 @@ function scanForNewJsonlFiles(
   }
 }
 
+function autoAdoptJsonlFile(
+  jsonlFile: string,
+  projectDir: string,
+  nextAgentIdRef: { current: number },
+  agents: Map<number, AgentState>,
+  activeAgentIdRef: { current: number | null },
+  fileWatchers: Map<number, fs.FSWatcher>,
+  pollingTimers: Map<number, ReturnType<typeof setInterval>>,
+  waitingTimers: Map<number, ReturnType<typeof setTimeout>>,
+  permissionTimers: Map<number, ReturnType<typeof setTimeout>>,
+  webview: vscode.Webview | undefined,
+  persistAgents: () => void,
+): void {
+  // Find an existing terminal to associate with (prefer Claude Code terminals)
+  // Allow null for VS Code extension mode (no CLI terminals)
+  const terminals = vscode.window.terminals;
+  const terminal = terminals.find((t) => t.name.includes('Claude')) || terminals[0] || null;
+
+  const id = nextAgentIdRef.current++;
+  const agent: AgentState = {
+    id,
+    terminalRef: terminal,
+    projectDir,
+    jsonlFile,
+    fileOffset: 0,
+    lineBuffer: '',
+    activeToolIds: new Set(),
+    activeToolStatuses: new Map(),
+    activeToolNames: new Map(),
+    activeSubagentToolIds: new Map(),
+    activeSubagentToolNames: new Map(),
+    isWaiting: false,
+    permissionSent: false,
+    hadToolsInTurn: false,
+  };
+
+  agents.set(id, agent);
+  activeAgentIdRef.current = id;
+  persistAgents();
+
+  console.log(
+    `[Pixel Sloths] Agent ${id}: auto-adopted session ${path.basename(jsonlFile)}${terminal ? ` on "${terminal.name}"` : ' (VS Code extension mode)'}`,
+  );
+  webview?.postMessage({ type: 'agentCreated', id });
+
+  startFileWatching(
+    id,
+    jsonlFile,
+    agents,
+    fileWatchers,
+    pollingTimers,
+    waitingTimers,
+    permissionTimers,
+    webview,
+  );
+  readNewLines(id, agents, waitingTimers, permissionTimers, webview);
+}
+
 function adoptTerminalForFile(
   terminal: vscode.Terminal,
   jsonlFile: string,
@@ -252,7 +350,7 @@ function adoptTerminalForFile(
   persistAgents();
 
   console.log(
-    `[Pixel Agents] Agent ${id}: adopted terminal "${terminal.name}" for ${path.basename(jsonlFile)}`,
+    `[Pixel Sloths] Agent ${id}: adopted terminal "${terminal.name}" for ${path.basename(jsonlFile)}`,
   );
   webview?.postMessage({ type: 'agentCreated', id });
 

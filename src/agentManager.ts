@@ -19,8 +19,30 @@ export function getProjectDirPath(cwd?: string): string | null {
   if (!workspacePath) return null;
   const dirName = workspacePath.replace(/[^a-zA-Z0-9-]/g, '-');
   const projectDir = path.join(os.homedir(), '.claude', 'projects', dirName);
-  console.log(`[Pixel Agents] Project dir: ${workspacePath} → ${dirName}`);
+  console.log(`[Pixel Sloths] Project dir: ${workspacePath} → ${dirName}`);
   return projectDir;
+}
+
+/** Returns all project directories under ~/.claude/projects/ that contain JSONL files */
+export function getAllProjectDirs(): string[] {
+  const projectsRoot = path.join(os.homedir(), '.claude', 'projects');
+  try {
+    return fs
+      .readdirSync(projectsRoot)
+      .map((d) => path.join(projectsRoot, d))
+      .filter((d) => {
+        try {
+          if (!fs.statSync(d).isDirectory()) return false;
+          // Only include dirs that have JSONL files
+          const files = fs.readdirSync(d);
+          return files.some((f) => f.endsWith('.jsonl'));
+        } catch {
+          return false;
+        }
+      });
+  } catch {
+    return [];
+  }
 }
 
 export async function launchNewTerminal(
@@ -34,7 +56,7 @@ export async function launchNewTerminal(
   waitingTimers: Map<number, ReturnType<typeof setTimeout>>,
   permissionTimers: Map<number, ReturnType<typeof setTimeout>>,
   jsonlPollTimers: Map<number, ReturnType<typeof setInterval>>,
-  projectScanTimerRef: { current: ReturnType<typeof setInterval> | null },
+  projectScanTimers: Map<string, ReturnType<typeof setInterval>>,
   webview: vscode.Webview | undefined,
   persistAgents: () => void,
   folderPath?: string,
@@ -54,7 +76,7 @@ export async function launchNewTerminal(
 
   const projectDir = getProjectDirPath(cwd);
   if (!projectDir) {
-    console.log(`[Pixel Agents] No project dir, cannot track agent`);
+    console.log(`[Pixel Sloths] No project dir, cannot track agent`);
     return;
   }
 
@@ -86,13 +108,13 @@ export async function launchNewTerminal(
   agents.set(id, agent);
   activeAgentIdRef.current = id;
   persistAgents();
-  console.log(`[Pixel Agents] Agent ${id}: created for terminal ${terminal.name}`);
+  console.log(`[Pixel Sloths] Agent ${id}: created for terminal ${terminal.name}`);
   webview?.postMessage({ type: 'agentCreated', id, folderName });
 
   ensureProjectScan(
     projectDir,
     knownJsonlFiles,
-    projectScanTimerRef,
+    projectScanTimers,
     activeAgentIdRef,
     nextAgentIdRef,
     agents,
@@ -109,7 +131,7 @@ export async function launchNewTerminal(
     try {
       if (fs.existsSync(agent.jsonlFile)) {
         console.log(
-          `[Pixel Agents] Agent ${id}: found JSONL file ${path.basename(agent.jsonlFile)}`,
+          `[Pixel Sloths] Agent ${id}: found JSONL file ${path.basename(agent.jsonlFile)}`,
         );
         clearInterval(pollTimer);
         jsonlPollTimers.delete(id);
@@ -183,7 +205,7 @@ export function persistAgents(
   for (const agent of agents.values()) {
     persisted.push({
       id: agent.id,
-      terminalName: agent.terminalRef.name,
+      terminalName: agent.terminalRef?.name ?? 'vscode-extension',
       jsonlFile: agent.jsonlFile,
       projectDir: agent.projectDir,
       folderName: agent.folderName,
@@ -203,7 +225,7 @@ export function restoreAgents(
   waitingTimers: Map<number, ReturnType<typeof setTimeout>>,
   permissionTimers: Map<number, ReturnType<typeof setTimeout>>,
   jsonlPollTimers: Map<number, ReturnType<typeof setInterval>>,
-  projectScanTimerRef: { current: ReturnType<typeof setInterval> | null },
+  projectScanTimers: Map<string, ReturnType<typeof setInterval>>,
   activeAgentIdRef: { current: number | null },
   webview: vscode.Webview | undefined,
   doPersist: () => void,
@@ -218,11 +240,12 @@ export function restoreAgents(
 
   for (const p of persisted) {
     const terminal = liveTerminals.find((t) => t.name === p.terminalName);
-    if (!terminal) continue;
+    // Allow restoration without terminal for VS Code extension mode
+    if (!terminal && p.terminalName !== 'vscode-extension') continue;
 
     const agent: AgentState = {
       id: p.id,
-      terminalRef: terminal,
+      terminalRef: terminal ?? null,
       projectDir: p.projectDir,
       jsonlFile: p.jsonlFile,
       fileOffset: 0,
@@ -240,7 +263,9 @@ export function restoreAgents(
 
     agents.set(p.id, agent);
     knownJsonlFiles.add(p.jsonlFile);
-    console.log(`[Pixel Agents] Restored agent ${p.id} → terminal "${p.terminalName}"`);
+    console.log(
+      `[Pixel Sloths] Restored agent ${p.id} → ${terminal ? `terminal "${p.terminalName}"` : 'VS Code extension mode'}`,
+    );
 
     if (p.id > maxId) maxId = p.id;
     // Extract terminal index from name like "Claude Code #3"
@@ -272,7 +297,7 @@ export function restoreAgents(
         const pollTimer = setInterval(() => {
           try {
             if (fs.existsSync(agent.jsonlFile)) {
-              console.log(`[Pixel Agents] Restored agent ${p.id}: found JSONL file`);
+              console.log(`[Pixel Sloths] Restored agent ${p.id}: found JSONL file`);
               clearInterval(pollTimer);
               jsonlPollTimers.delete(p.id);
               const stat = fs.statSync(agent.jsonlFile);
@@ -315,7 +340,7 @@ export function restoreAgents(
     ensureProjectScan(
       restoredProjectDir,
       knownJsonlFiles,
-      projectScanTimerRef,
+      projectScanTimers,
       activeAgentIdRef,
       nextAgentIdRef,
       agents,
@@ -354,7 +379,7 @@ export function sendExistingAgents(
     }
   }
   console.log(
-    `[Pixel Agents] sendExistingAgents: agents=${JSON.stringify(agentIds)}, meta=${JSON.stringify(agentMeta)}`,
+    `[Pixel Sloths] sendExistingAgents: agents=${JSON.stringify(agentIds)}, meta=${JSON.stringify(agentMeta)}`,
   );
 
   webview.postMessage({
@@ -365,6 +390,128 @@ export function sendExistingAgents(
   });
 
   sendCurrentAgentStatuses(agents, webview);
+}
+
+export interface DiscoveredSession {
+  jsonlFile: string;
+  projectDir: string;
+  projectName: string;
+  lastModified: number;
+  sizeKB: number;
+}
+
+/** Scans all project dirs for active JSONL files not already tracked by an agent */
+export function getActiveSessions(agents: Map<number, AgentState>): DiscoveredSession[] {
+  const trackedFiles = new Set<string>();
+  for (const agent of agents.values()) {
+    trackedFiles.add(agent.jsonlFile);
+  }
+
+  const RECENT_THRESHOLD_MS = 30 * 60 * 1000; // 30 minutes
+  const now = Date.now();
+  const sessions: DiscoveredSession[] = [];
+
+  for (const dir of getAllProjectDirs()) {
+    const dirName = path.basename(dir);
+    // Convert project dir name back to readable form
+    const projectName = dirName.replace(/^-/, '').replace(/-/g, '/');
+    try {
+      const files = fs
+        .readdirSync(dir)
+        .filter((f) => f.endsWith('.jsonl'))
+        .map((f) => path.join(dir, f));
+      for (const f of files) {
+        if (trackedFiles.has(f)) continue;
+        try {
+          const stat = fs.statSync(f);
+          const age = now - stat.mtimeMs;
+          if (age < RECENT_THRESHOLD_MS && stat.size > 0) {
+            sessions.push({
+              jsonlFile: f,
+              projectDir: dir,
+              projectName,
+              lastModified: stat.mtimeMs,
+              sizeKB: Math.round(stat.size / 1024),
+            });
+          }
+        } catch {
+          /* stat failed */
+        }
+      }
+    } catch {
+      /* dir read failed */
+    }
+  }
+
+  // Sort by most recently modified first
+  sessions.sort((a, b) => b.lastModified - a.lastModified);
+  return sessions;
+}
+
+/** Adopt a specific JSONL session file as a new agent */
+export function adoptSessionByFile(
+  jsonlFile: string,
+  projectDir: string,
+  nextAgentIdRef: { current: number },
+  agents: Map<number, AgentState>,
+  activeAgentIdRef: { current: number | null },
+  knownJsonlFiles: Set<string>,
+  fileWatchers: Map<number, fs.FSWatcher>,
+  pollingTimers: Map<number, ReturnType<typeof setInterval>>,
+  waitingTimers: Map<number, ReturnType<typeof setTimeout>>,
+  permissionTimers: Map<number, ReturnType<typeof setTimeout>>,
+  webview: vscode.Webview | undefined,
+  persistAgents: () => void,
+): void {
+  // Check not already tracked
+  for (const agent of agents.values()) {
+    if (agent.jsonlFile === jsonlFile) return;
+  }
+
+  knownJsonlFiles.add(jsonlFile);
+
+  const id = nextAgentIdRef.current++;
+  const dirName = path.basename(projectDir).replace(/^-/, '');
+  // Extract a short folder name from the project dir
+  const parts = dirName.split('-');
+  const folderName = parts[parts.length - 1] || dirName;
+
+  const agent: AgentState = {
+    id,
+    terminalRef: null,
+    projectDir,
+    jsonlFile,
+    fileOffset: 0,
+    lineBuffer: '',
+    activeToolIds: new Set(),
+    activeToolStatuses: new Map(),
+    activeToolNames: new Map(),
+    activeSubagentToolIds: new Map(),
+    activeSubagentToolNames: new Map(),
+    isWaiting: false,
+    permissionSent: false,
+    hadToolsInTurn: false,
+    folderName,
+  };
+
+  agents.set(id, agent);
+  activeAgentIdRef.current = id;
+  persistAgents();
+
+  console.log(`[Pixel Sloths] Agent ${id}: manually adopted session ${path.basename(jsonlFile)}`);
+  webview?.postMessage({ type: 'agentCreated', id, folderName });
+
+  startFileWatching(
+    id,
+    jsonlFile,
+    agents,
+    fileWatchers,
+    pollingTimers,
+    waitingTimers,
+    permissionTimers,
+    webview,
+  );
+  readNewLines(id, agents, waitingTimers, permissionTimers, webview);
 }
 
 export function sendCurrentAgentStatuses(

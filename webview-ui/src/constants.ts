@@ -49,7 +49,7 @@ export const BUTTON_LINE_WIDTH_ZOOM_FACTOR = 0.5;
 export const BUBBLE_FADE_DURATION_SEC = 0.5;
 export const BUBBLE_SITTING_OFFSET_PX = 10;
 export const BUBBLE_VERTICAL_OFFSET_PX = 24;
-export const FALLBACK_FLOOR_COLOR = '#808080';
+export const FALLBACK_FLOOR_COLOR = '#2A2018';
 
 // ── Rendering - Overlay Colors (canvas, not CSS) ─────────────
 export const SEAT_OWN_COLOR = 'rgba(0, 127, 212, 0.35)';
@@ -84,8 +84,8 @@ export const PAN_MARGIN_FRACTION = 0.25;
 // ── Editor ───────────────────────────────────────────────────
 export const UNDO_STACK_MAX_SIZE = 50;
 export const LAYOUT_SAVE_DEBOUNCE_MS = 500;
-export const DEFAULT_FLOOR_COLOR: FloorColor = { h: 35, s: 30, b: 15, c: 0 };
-export const DEFAULT_WALL_COLOR: FloorColor = { h: 240, s: 25, b: 0, c: 0 };
+export const DEFAULT_FLOOR_COLOR: FloorColor = { h: 140, s: 35, b: 10, c: 0 }; // forest green
+export const DEFAULT_WALL_COLOR: FloorColor = { h: 30, s: 40, b: -5, c: 0 }; // warm wood/bamboo
 export const DEFAULT_NEUTRAL_COLOR: FloorColor = { h: 0, s: 0, b: 0, c: 0 };
 
 // ── Notification Sound ──────────────────────────────────────

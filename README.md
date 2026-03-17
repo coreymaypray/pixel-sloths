@@ -1,35 +1,26 @@
 <h1 align="center">
-    <a href="https://github.com/pablodelucca/pixel-agents/discussions">
-        <img src="webview-ui/public/banner.png" alt="Pixel Agents">
-    </a>
+    <img src="webview-ui/public/banner.png" alt="Pixel Sloths">
 </h1>
 
 <h2 align="center" style="padding-bottom: 20px;">
-  The game interface where AI agents build real things
+  Sloth-themed pixel art office where your Claude Code agents come to life — by Cyber Sloth Empire
 </h2>
 
 <div align="center" style="margin-top: 25px;">
 
-[![vscode-version](https://img.shields.io/visual-studio-marketplace/v/pablodelucca.pixel-agents?logo=visualstudiocode&color=0183ff)](https://marketplace.visualstudio.com/items?itemName=pablodelucca.pixel-agents)
-[![installs](https://img.shields.io/visual-studio-marketplace/i/pablodelucca.pixel-agents?color=0183ff&style=flat)](https://marketplace.visualstudio.com/items?itemName=pablodelucca.pixel-agents)
-[![stars](https://img.shields.io/github/stars/pablodelucca/pixel-agents?logo=github&color=0183ff&style=flat)](https://github.com/pablodelucca/pixel-agents/stargazers)
-[![license](https://img.shields.io/github/license/pablodelucca/pixel-agents?color=0183ff&style=flat)](https://github.com/pablodelucca/pixel-agents/blob/main/LICENSE)
+[![license](https://img.shields.io/github/license/coreymaypray/pixel-sloths?color=0183ff&style=flat)](https://github.com/coreymaypray/pixel-sloths/blob/main/LICENSE)
 
-</div>
-
-<div align="center">
-<a href="https://marketplace.visualstudio.com/items?itemName=pablodelucca.pixel-agents">🛒 VS Code Marketplace</a> • <a href="https://github.com/pablodelucca/pixel-agents/discussions">💬 Discussions</a> • <a href="https://github.com/pablodelucca/pixel-agents/issues">🐛 Issues</a> • <a href="CONTRIBUTING.md">🤝 Contributing</a>
 </div>
 
 <br/>
 
-Pixel Agents turns multi-agent AI systems into something you can actually see and manage. Each agent becomes a character in a pixel art office. They walk around, sit at their desk, and visually reflect what they are doing — typing when writing code, reading when searching files, waiting when it needs your attention.
+> **Fork of [Pixel Sloths](https://github.com/coreymaypray/pixel-sloths)** by Pablo De Lucca. Rebranded as **Pixel Sloths** for the Cyber Sloth Empire.
 
-Right now it works as a VS Code extension with Claude Code. The vision though, is a fully agent-agnostic, platform-agnostic interface for orchestrating any AI agents, deployable anywhere.
+Pixel Sloths turns multi-agent AI systems into something you can actually see and manage. Each agent becomes an animated sloth character in a pixel art office. They walk around, sit at their desk, and visually reflect what they are doing — typing when writing code, reading when searching files, waiting when it needs your attention.
 
-This is the source code for the free Pixel Agents extension for VS Code — install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=pablodelucca.pixel-agents) or [Open VSX](https://open-vsx.org/extension/pablodelucca/pixel-agents) with the full furniture catalog included.
+Right now it works as a VS Code extension with Claude Code.
 
-![Pixel Agents screenshot](webview-ui/public/Screenshot.jpg)
+![Pixel Sloths screenshot](webview-ui/public/Screenshot.jpg)
 
 ## Features
 
@@ -43,7 +34,7 @@ This is the source code for the free Pixel Agents extension for VS Code — inst
 - **Diverse characters** — 6 diverse characters. These are based on the amazing work of [JIK-A-4, Metro City](https://jik-a-4.itch.io/metrocity-free-topdown-character-pack).
 
 <p align="center">
-  <img src="webview-ui/public/characters.png" alt="Pixel Agents characters" width="320" height="72" style="image-rendering: pixelated;">
+  <img src="webview-ui/public/characters.png" alt="Pixel Sloths characters" width="320" height="72" style="image-rendering: pixelated;">
 </p>
 
 ## Requirements
@@ -53,13 +44,13 @@ This is the source code for the free Pixel Agents extension for VS Code — inst
 
 ## Getting Started
 
-If you just want to use Pixel Agents, the easiest way is to download the [VS Code extension](https://marketplace.visualstudio.com/items?itemName=pablodelucca.pixel-agents). If you want to play with the code, develop, or contribute, then:
+If you want to play with the code, develop, or contribute:
 
 ### Install from source
 
 ```bash
-git clone https://github.com/pablodelucca/pixel-agents.git
-cd pixel-agents
+git clone https://github.com/coreymaypray/pixel-sloths.git
+cd pixel-sloths
 npm install
 cd webview-ui && npm install && cd ..
 npm run build
@@ -69,7 +60,7 @@ Then press **F5** in VS Code to launch the Extension Development Host.
 
 ### Usage
 
-1. Open the **Pixel Agents** panel (it appears in the bottom panel area alongside your terminal)
+1. Open the **Pixel Sloths** panel (it appears in the bottom panel area alongside your terminal)
 2. Click **+ Agent** to spawn a new Claude Code terminal and its character
 3. Start coding with Claude — watch the character react in real time
 4. Click a character to select it, then click a seat to reassign it
@@ -101,7 +92,7 @@ Characters are based on the amazing work of [JIK-A-4, Metro City](https://jik-a-
 
 ## How It Works
 
-Pixel Agents watches Claude Code's JSONL transcript files to track what each agent is doing. When an agent uses a tool (like writing a file or running a command), the extension detects it and updates the character's animation accordingly. No modifications to Claude Code are needed — it's purely observational.
+Pixel Sloths watches Claude Code's JSONL transcript files to track what each agent is doing. When an agent uses a tool (like writing a file or running a command), the extension detects it and updates the character's animation accordingly. No modifications to Claude Code are needed — it's purely observational.
 
 The webview runs a lightweight game loop with canvas rendering, BFS pathfinding, and a character state machine (idle → walk → type/read). Everything is pixel-perfect at integer zoom levels.
 
@@ -133,12 +124,12 @@ For this to work, the architecture needs to be modular at every level:
 - **Agent-agnostic**: Claude Code today, but built to support Codex, OpenCode, Gemini, Cursor, Copilot, and others through composable adapters.
 - **Theme-agnostic**: community-created assets, skins, and themes from any contributor.
 
-We're actively working on the core module and adapter architecture that makes this possible. If you're interested to talk about this further, please visit our [Discussions Section](https://github.com/pablodelucca/pixel-agents/discussions).
+We're actively working on the core module and adapter architecture that makes this possible. If you're interested to talk about this further, please visit our [Discussions Section](https://github.com/coreymaypray/pixel-sloths/discussions).
 
 
 ## Community & Contributing
 
-We use **[GitHub Discussions](https://github.com/pablodelucca/pixel-agents/discussions)** for questions, feature ideas, and conversations. **[Issues](https://github.com/pablodelucca/pixel-agents/issues)** are for bug reports only.
+We use **[GitHub Discussions](https://github.com/coreymaypray/pixel-sloths/discussions)** for questions, feature ideas, and conversations. **[Issues](https://github.com/coreymaypray/pixel-sloths/issues)** are for bug reports only.
 
 If something is broken, open an issue. For everything else, start a discussion.
 
@@ -146,20 +137,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions on how to contribute.
 
 Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
 
-## Supporting the Project
+## Credits
 
-If you find Pixel Agents useful, consider supporting its development:
-
-<a href="https://github.com/sponsors/pablodelucca">
-  <img src="https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=github" alt="GitHub Sponsors">
-</a>
-<a href="https://ko-fi.com/pablodelucca">
-  <img src="https://img.shields.io/badge/Support-Ko--fi-ff5e5b?logo=ko-fi" alt="Ko-fi">
-</a>
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=pablodelucca/pixel-agents&type=Date)](https://www.star-history.com/?repos=pablodelucca%2Fpixel-agents&type=date&legend=bottom-right)
+Forked from [Pixel Agents](https://github.com/pablodelucca/pixel-agents) by Pablo De Lucca. Consider [sponsoring the original project](https://github.com/sponsors/pablodelucca).
 
 ## License
 

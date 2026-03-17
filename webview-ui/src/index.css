@@ -7,44 +7,44 @@
 }
 
 :root {
-  --pixel-bg: #1e1e2e;
-  --pixel-border: #4a4a6a;
-  --pixel-border-light: #6a6a8a;
-  --pixel-accent: #5a8cff;
+  --pixel-bg: #0f1a12;
+  --pixel-border: #3a5a3a;
+  --pixel-border-light: #5a7a5a;
+  --pixel-accent: #00d4aa;
   --pixel-green: #5ac88c;
-  --pixel-shadow: 2px 2px 0px #0a0a14;
+  --pixel-shadow: 2px 2px 0px #050a06;
 
   /* Button base */
-  --pixel-text: rgba(255, 255, 255, 0.8);
-  --pixel-text-dim: rgba(255, 255, 255, 0.7);
-  --pixel-btn-bg: rgba(255, 255, 255, 0.08);
-  --pixel-btn-hover-bg: rgba(255, 255, 255, 0.15);
+  --pixel-text: rgba(220, 235, 210, 0.9);
+  --pixel-text-dim: rgba(200, 220, 190, 0.7);
+  --pixel-btn-bg: rgba(100, 160, 100, 0.12);
+  --pixel-btn-hover-bg: rgba(100, 180, 120, 0.22);
   --pixel-btn-disabled-opacity: 0.35;
 
   /* Active/selected button state */
-  --pixel-active-bg: rgba(90, 140, 255, 0.25);
+  --pixel-active-bg: rgba(0, 212, 170, 0.25);
 
   /* Agent button */
-  --pixel-agent-bg: rgba(90, 200, 140, 0.15);
-  --pixel-agent-hover-bg: rgba(90, 200, 140, 0.3);
-  --pixel-agent-border: #5ac88c;
-  --pixel-agent-text: rgba(200, 255, 220, 0.95);
+  --pixel-agent-bg: rgba(0, 212, 170, 0.15);
+  --pixel-agent-hover-bg: rgba(0, 212, 170, 0.3);
+  --pixel-agent-border: #00d4aa;
+  --pixel-agent-text: rgba(180, 255, 220, 0.95);
 
   /* Close button */
   --pixel-close-text: rgba(255, 255, 255, 0.5);
   --pixel-close-hover: #e55;
 
   /* Hints & confirmations */
-  --pixel-hint-bg: #3278c8;
+  --pixel-hint-bg: #2a6848;
   --pixel-reset-text: #ecc;
   --pixel-danger-bg: #a33;
 
-  /* Vignette */
-  --pixel-vignette: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.6) 100%);
+  /* Vignette — jungle canopy shadow */
+  --pixel-vignette: radial-gradient(ellipse at center, transparent 40%, rgba(0, 10, 5, 0.7) 100%);
 
   /* Status dot colors */
   --pixel-status-permission: var(--vscode-charts-yellow, #cca700);
-  --pixel-status-active: var(--vscode-charts-blue, #3794ff);
+  --pixel-status-active: var(--vscode-charts-blue, #00d4aa);
 
   /* ToolOverlay z-index layers */
   --pixel-overlay-z: 41;

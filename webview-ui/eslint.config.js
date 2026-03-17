@@ -6,7 +6,7 @@ import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import { defineConfig, globalIgnores } from 'eslint/config';
-import pixelAgentsPlugin from '../eslint-rules/pixel-agents-rules.mjs';
+import pixelSlothsPlugin from '../eslint-rules/pixel-sloths-rules.mjs';
 
 export default defineConfig([
   globalIgnores(['dist']),
@@ -20,7 +20,7 @@ export default defineConfig([
     ],
     plugins: {
       'simple-import-sort': simpleImportSort,
-      'pixel-agents': pixelAgentsPlugin,
+      'pixel-sloths': pixelSlothsPlugin,
     },
     languageOptions: {
       ecmaVersion: 2020,
@@ -36,17 +36,17 @@ export default defineConfig([
       'react-hooks/immutability': 'off',
       'react-hooks/refs': 'off',
       'react-hooks/set-state-in-effect': 'off',
-      'pixel-agents/no-inline-colors': 'warn',
-      'pixel-agents/pixel-shadow': 'warn',
-      'pixel-agents/pixel-font': 'warn',
+      'pixel-sloths/no-inline-colors': 'warn',
+      'pixel-sloths/pixel-shadow': 'warn',
+      'pixel-sloths/pixel-font': 'warn',
     },
   },
   {
     files: ['src/constants.ts', 'src/fonts/**', 'src/office/sprites/**'],
     rules: {
-      'pixel-agents/no-inline-colors': 'off',
-      'pixel-agents/pixel-shadow': 'off',
-      'pixel-agents/pixel-font': 'off',
+      'pixel-sloths/no-inline-colors': 'off',
+      'pixel-sloths/pixel-shadow': 'off',
+      'pixel-sloths/pixel-font': 'off',
     },
   },
   eslintConfigPrettier,

@@ -226,12 +226,12 @@ function App() {
       style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}
     >
       <style>{`
-        @keyframes pixel-agents-pulse {
+        @keyframes pixel-sloths-pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.3; }
         }
-        .pixel-agents-pulse { animation: pixel-agents-pulse ${PULSE_ANIMATION_DURATION_SEC}s ease-in-out infinite; }
-        .pixel-agents-migration-btn:hover { filter: brightness(0.8); }
+        .pixel-sloths-pulse { animation: pixel-sloths-pulse ${PULSE_ANIMATION_DURATION_SEC}s ease-in-out infinite; }
+        .pixel-sloths-migration-btn:hover { filter: brightness(0.8); }
       `}</style>
 
       <OfficeCanvas
@@ -271,6 +271,11 @@ function App() {
         isDebugMode={isDebugMode}
         onToggleDebugMode={handleToggleDebugMode}
         workspaceFolders={workspaceFolders}
+        trackedAgents={agents.map((id) => ({
+          id,
+          status: agentStatuses[id] || 'active',
+        }))}
+        onFocusAgent={handleSelectAgent}
       />
 
       {editor.isEditMode && editor.isDirty && (
@@ -394,10 +399,10 @@ function App() {
               exciting updates ahead.
             </p>
             <p style={{ fontSize: '26px', color: 'var(--pixel-text-dim)', margin: '0 0 20px 0' }}>
-              Stay tuned, and thanks for using Pixel Agents!
+              Stay tuned, and thanks for using Pixel Sloths!
             </p>
             <button
-              className="pixel-agents-migration-btn"
+              className="pixel-sloths-migration-btn"
               style={{
                 padding: '6px 24px 8px',
                 fontSize: '30px',

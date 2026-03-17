@@ -1,12 +1,12 @@
 {
-  "name": "pixel-agents",
-  "displayName": "Pixel Agents",
-  "description": "Pixel art office where your Claude Code agents come to life as animated characters",
+  "name": "pixel-sloths",
+  "displayName": "Pixel Sloths",
+  "description": "Sloth-themed pixel art office where your Claude Code agents come to life as animated sloth characters — by Cyber Sloth Empire",
   "version": "1.1.1",
-  "publisher": "pablodelucca",
+  "publisher": "cyberslothempire",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pablodelucca/pixel-agents"
+    "url": "https://github.com/coreymaypray/pixel-sloths"
   },
   "icon": "icon.png",
   "license": "MIT",
@@ -21,29 +21,29 @@
   "contributes": {
     "commands": [
       {
-        "command": "pixel-agents.showPanel",
-        "title": "Pixel Agents: Show Panel"
+        "command": "pixel-sloths.showPanel",
+        "title": "Pixel Sloths: Show Panel"
       },
       {
-        "command": "pixel-agents.exportDefaultLayout",
-        "title": "Pixel Agents: Export Layout as Default"
+        "command": "pixel-sloths.exportDefaultLayout",
+        "title": "Pixel Sloths: Export Layout as Default"
       }
     ],
     "viewsContainers": {
       "panel": [
         {
-          "id": "pixel-agents-panel",
-          "title": "Pixel Agents",
+          "id": "pixel-sloths-panel",
+          "title": "Pixel Sloths",
           "icon": "$(window)"
         }
       ]
     },
     "views": {
-      "pixel-agents-panel": [
+      "pixel-sloths-panel": [
         {
           "type": "webview",
-          "id": "pixel-agents.panelView",
-          "name": "Pixel Agents"
+          "id": "pixel-sloths.panelView",
+          "name": "Pixel Sloths"
         }
       ]
     }

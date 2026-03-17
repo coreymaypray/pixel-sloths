@@ -1,6 +1,6 @@
-# Contributing to Pixel Agents
+# Contributing to Pixel Sloths
 
-Thanks for your interest in contributing to Pixel Agents! All contributions are welcome — features, bug fixes, documentation improvements, refactors, and more.
+Thanks for your interest in contributing to Pixel Sloths! All contributions are welcome — features, bug fixes, documentation improvements, refactors, and more.
 
 This project is licensed under the [MIT License](LICENSE), so your contributions will be too. No CLA or DCO is required.
 
@@ -14,8 +14,8 @@ This project is licensed under the [MIT License](LICENSE), so your contributions
 ### Setup
 
 ```bash
-git clone https://github.com/pablodelucca/pixel-agents.git
-cd pixel-agents
+git clone https://github.com/coreymaypray/pixel-sloths.git
+cd pixel-sloths
 npm install
 cd webview-ui && npm install && cd ..
 npm run build
@@ -63,7 +63,7 @@ The project uses a pixel art aesthetic. All overlays should use:
 - Hard offset shadows (`2px 2px 0px`, no blur) — use `var(--pixel-shadow)`
 - The FS Pixel Sans font (loaded in `index.css`)
 
-These conventions are enforced by custom ESLint rules (`eslint-rules/pixel-agents-rules.mjs`):
+These conventions are enforced by custom ESLint rules (`eslint-rules/pixel-sloths-rules.mjs`):
 
 | Rule | Scope | What it checks |
 |---|---|---|
@@ -91,11 +91,11 @@ These rules are set to `warn` — they won't block your PR but will flag violati
 
 ## Reporting Bugs
 
-[Open a bug report](https://github.com/pablodelucca/pixel-agents/issues/new?template=bug_report.yml) — the form will guide you through providing the details we need.
+[Open a bug report](https://github.com/coreymaypray/pixel-sloths/issues/new?template=bug_report.yml) — the form will guide you through providing the details we need.
 
 ## Feature Requests
 
-Have an idea? [Start a discussion](https://github.com/pablodelucca/pixel-agents/discussions/categories/ideas) in the Ideas category. We love hearing new ideas, and discussing them first helps us collaborate on the best approach together.
+Have an idea? [Start a discussion](https://github.com/coreymaypray/pixel-sloths/discussions/categories/ideas) in the Ideas category. We love hearing new ideas, and discussing them first helps us collaborate on the best approach together.
 
 ## Security Issues
 
